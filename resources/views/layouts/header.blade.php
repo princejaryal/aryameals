@@ -82,7 +82,7 @@
               <form method="POST" action="{{ route('auth.logout') }}" class="m-0" onsubmit="return true;">
                 @csrf
                 <button type="submit" class="dropdown-item text-danger">
-                  <i class="fas fa-sign-out-alt me-2"></i> Logoutt
+                  <i class="fas fa-sign-out-alt me-2"></i> Logout
                 </button>
               </form>
             </li>
