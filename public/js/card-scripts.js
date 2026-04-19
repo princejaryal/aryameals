@@ -84,64 +84,68 @@ let cardCart = [];
 function addToCart(id, name, quantity, basePrice, restaurant, image, unit) {
     // Handle undefined/null basePrice
     if (basePrice === undefined || basePrice === null || basePrice === 0) {
-        console.warn('Price not available for item:', id);
-        showNotification('Price not available for this item');
+        console.warn("Price not available for item:", id);
+        showNotification("Price not available for this item");
         return;
     }
 
     // Send to server
-    fetch('/cart/add', {
-        method: 'POST',
+    fetch("/cart/add", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content"),
         },
         body: JSON.stringify({
-            item_id: id,
+            menu_item_id: id,
             quantity: quantity,
-            portion_size: 'full', // Default to full for all items
+            portion_size: "full", // Default to full for all items
             restaurant: restaurant,
-            unit: unit
-        })
+            unit: unit,
+        }),
     })
-    .then(data => data.json())
-    .then(data => {
-        if(data.success){
-            // Update local cart
-            const price = basePrice * quantity;
-            const item = cardCart.find(i=>i.id===id);
-            if(item){
-                item.quantity += parseInt(quantity);
-                item.totalPrice = item.basePrice * item.quantity;
+        .then((data) => data.json())
+        .then((data) => {
+            if (data.success) {
+                // Update local cart
+                const price = basePrice * quantity;
+                const item = cardCart.find((i) => i.id === id);
+                if (item) {
+                    item.quantity += parseInt(quantity);
+                    item.totalPrice = item.basePrice * item.quantity;
+                } else {
+                    cardCart.push({
+                        id,
+                        name,
+                        quantity: parseInt(quantity),
+                        basePrice,
+                        totalPrice: price,
+                        restaurant,
+                        image,
+                        unit,
+                    });
+                }
+                updateCartUI();
+                showNotification(name + " added to cart!");
+                // Update cart count badges immediately
+                if (data.cart_count !== undefined) {
+                    const cartCountEl = document.getElementById("cartCount");
+                    const cartCountMobileEl =
+                        document.getElementById("cartCountMobile");
+                    if (cartCountEl) cartCountEl.textContent = data.cart_count;
+                    if (cartCountMobileEl)
+                        cartCountMobileEl.textContent = data.cart_count;
+                }
             } else {
-                cardCart.push({
-                    id,
-                    name,
-                    quantity: parseInt(quantity),
-                    basePrice,
-                    totalPrice: price,
-                    restaurant,
-                    image,
-                    unit
-                });
+                showNotification(data.message || "Failed to add to cart");
             }
-            updateCartUI();
-            showNotification(name + " added to cart!");
-            // Update cart count badges immediately
-            if (data.cart_count !== undefined) {
-                const cartCountEl = document.getElementById("cartCount");
-                const cartCountMobileEl = document.getElementById("cartCountMobile");
-                if (cartCountEl) cartCountEl.textContent = data.cart_count;
-                if (cartCountMobileEl) cartCountMobileEl.textContent = data.cart_count;
-            }
-        } else {
-            showNotification(data.message || "Failed to add to cart");
-        }
-    })
-    .catch((error) => {
-        console.error("Error:", error);
-        showNotification("Network error. Please try again.");
-    });
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            showNotification("Network error. Please try again.");
+        });
 }
 
 function updateCartUI() {
