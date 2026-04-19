@@ -85,7 +85,7 @@
                         <label class="block text-sm font-medium text-purple-700 mb-2">Phone <span class="text-red-600">*</span></label>
                         <input type="tel" name="phone" value="{{ $restaurant->phone }}"
                                class="w-full px-4 py-3 rounded-lg border border-purple-200 bg-white text-slate-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                               placeholder="+91 98765 43210">
+                               placeholder=" 98765 43210">
                     </div>
                     
                     <!-- Address Information -->

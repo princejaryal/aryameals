@@ -19,13 +19,14 @@
 
 @media (max-width: 768px) {
     .menu-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
 }
 
 @media (max-width: 576px) {
     .menu-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
         gap: 15px;
     }
 }
