@@ -170,7 +170,7 @@
                 <tbody>
                     @foreach($order->orderItems as $item)
                         <tr>
-                            <td>{{ $item->menuItem->name }}</td>
+                            <td>{{ $item->menuItem->name ?? $item->name ?? 'Item Deleted' }}</td>
                             <td>{{ $item->menuItem->restaurant->name ?? 'N/A' }}</td>
                             <td>{{ $item->quantity }}</td>
                             <td>Rs. {{ number_format($item->price, 0) }}</td>
