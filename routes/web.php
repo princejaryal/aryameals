@@ -71,6 +71,7 @@ Route::get('/order/track/{orderId}', function ($orderId) {
 })->name('order.track');
 Route::get('/orders', [CartController::class, 'userOrders'])->name('orders.index');
 Route::get('/invoice/{orderId}/download', [InvoiceController::class, 'download'])->name('invoice.download');
+Route::post('/invoice/{orderId}/raw', [InvoiceController::class, 'rawDownload'])->name('invoice.download.raw');
 
 /*
 |--------------------------------------------------------------------------
