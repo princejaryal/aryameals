@@ -142,7 +142,6 @@
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-purple-900">{{ $customer->name }}</div>
-                                            <div class="text-sm text-purple-500">ID: #{{ $customer->id }}</div>
                                         </div>
                                     </div>
                                 </td>

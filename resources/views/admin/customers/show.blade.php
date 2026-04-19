@@ -42,10 +42,6 @@
                         <p class="text-purple-600 mb-4">{{ $customer->email }}</p>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between">
-                                <span class="text-purple-500">Customer ID:</span>
-                                <span class="font-medium text-purple-900">#{{ $customer->id }}</span>
-                            </div>
-                            <div class="flex justify-between">
                                 <span class="text-purple-500">Member Since:</span>
                                 <span class="font-medium text-purple-900">{{ $customer->created_at->format('M d, Y') }}</span>
                             </div>

@@ -1,13 +1,31 @@
 <nav class="custom-header">
-  <div class="container-fluid px-4">
+  <div class="container-fluid">
     <div class="header-row">
       <!-- MOBILE TOGGLE -->
       <div class="mobile-toggle d-lg-none order-0" onclick="toggleMobileMenu()">
         <i class="fas fa-bars"></i>
       </div>
 
-      <!-- LOGO - Left Corner -->
-      <div class="logo m-0">
+      <!-- MOBILE SEARCH BAR -->
+      <div class="mobile-search d-lg-none order-2 flex-grow-1 px-2">
+        <form action="{{ route('search') }}" method="GET" class="position-relative">
+          <input type="text" name="q" class="form-control mobile-search-input" placeholder="Search food, restaurants..."
+                 style="padding: 8px 40px 8px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">
+          <button type="submit" class="btn position-absolute mobile-search-btn" style="right: 8px; top: 50%; transform: translateY(-50%); color: white; background: none; border: none;">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- LOGO - Mobile Center -->
+      <div class="logo d-lg-none m-0 order-1">
+        <a href="{{ route('home') }}" class="text-decoration-none">
+          <img src="{{ asset('images/home/Arya-1-1.png') }}" alt="AryaMeals Logo" style="height: 40px;">
+        </a>
+      </div>
+
+      <!-- LOGO - Desktop Left Corner -->
+      <div class="logo d-none d-lg-block m-0">
         <a href="{{ route('home') }}" class="text-decoration-none">
           <img src="{{ asset('images/home/Arya-1-1.png') }}" alt="AryaMeals Logo">
         </a>
@@ -77,11 +95,53 @@
             @endif
             <span class="text-white">{{ Auth::user()->name }}</span>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userDropdown">
+            <li class="user-info-section">
+              <div class="user-details p-3">
+                <div class="d-flex align-items-center mb-3">
+                  @if(Auth::user()->avatar)
+                    <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid #f97316;">
+                  @else
+                    <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: linear-gradient(135deg, #f97316, #ea580c); color: white; font-size: 20px;">
+                      {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                  @endif
+                  <div class="flex-grow-1">
+                    <strong class="d-block text-dark">{{ Auth::user()->name }}</strong>
+                    <small class="text-muted d-block">{{ Auth::user()->email }}</small>
+                    @if(Auth::user()->phone)
+                      <small class="text-muted d-block"><i class="fas fa-phone me-1"></i>{{ Auth::user()->phone }}</small>
+                    @endif
+                  </div>
+                </div>
+                <div class="user-stats d-flex justify-content-around text-center">
+                  <div>
+                    <strong class="text-primary d-block">{{ Auth::user()->orders()->count() }}</strong>
+                    <small class="text-muted">Orders</small>
+                  </div>
+                  <div>
+                    <strong class="text-success d-block">{{ Auth::user()->addresses()->count() }}</strong>
+                    <small class="text-muted">Addresses</small>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a href="{{ route('orders.index') }}" class="dropdown-item user-dropdown-item">
+                <i class="fas fa-shopping-bag me-2"></i> My Orders
+              </a>
+            </li>
+            <li>
+              <a href="{{ route('cart.index') }}" class="dropdown-item user-dropdown-item">
+                <i class="fas fa-shopping-cart me-2"></i> My Cart
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
             <li>
               <form method="POST" action="{{ route('auth.logout') }}" class="m-0" onsubmit="return true;">
                 @csrf
-                <button type="submit" class="dropdown-item text-danger">
+                <button type="submit" class="dropdown-item user-dropdown-item logout-item">
                   <i class="fas fa-sign-out-alt me-2"></i> Logout
                 </button>
               </form>
@@ -99,19 +159,7 @@
           <i class="fas fa-shopping-cart text-white"></i>
           <span class="cart-count-badge" id="cartCountMobile">0</span>
         </a>
-        @if(Auth::check())
-        <div class="mobile-user-profile d-flex align-items-center gap-2">
-          @if(Auth::user()->avatar)
-          <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
-          @else
-          <i class="fas fa-user-circle text-white" style="font-size: 20px;"></i>
-          @endif
-        </div>
-        @endif
       </div>
-
-
-
     </div>
   </div>
 </nav>
@@ -151,6 +199,9 @@
           </div>
         </div>
       </div>
+      <a href="{{ route('orders.index') }}" class="mobile-menu-link">
+        <i class="fas fa-shopping-bag me-2"></i> My Orders
+      </a>
       <a href="{{ route('cart.index') }}" class="mobile-menu-link">
         <i class="fas fa-shopping-cart me-2"></i> My Cart
       </a>
@@ -257,3 +308,141 @@
     });
   });
 </script>
+
+<style>
+/* User Dropdown Styles */
+.user-dropdown-btn {
+  transition: all 0.3s ease !important;
+  border-radius: 12px !important;
+  padding: 8px 16px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.user-dropdown-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.user-dropdown-btn:focus {
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3) !important;
+}
+
+.user-dropdown-menu {
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  padding: 12px !important;
+  margin-top: 8px !important;
+  min-width: 200px !important;
+  animation: dropdownShow 0.2s ease-out !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+@keyframes dropdownShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.user-dropdown-item {
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  margin: 2px 0 !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+  color: #334155 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.user-dropdown-item:hover {
+  background: linear-gradient(135deg, #fff7ed, #fef3e2) !important;
+  color: #f97316 !important;
+  transform: translateX(4px) !important;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15) !important;
+}
+
+.user-dropdown-item i {
+  width: 16px !important;
+  text-align: center !important;
+  transition: transform 0.3s ease !important;
+}
+
+.user-dropdown-item:hover i {
+  transform: scale(1.1) !important;
+}
+
+.logout-item:hover {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2) !important;
+  color: #dc2626 !important;
+}
+
+.logout-item:hover i {
+  transform: scale(1.1) !important;
+}
+
+.dropdown-divider {
+  margin: 8px 12px !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Dropdown show animation */
+.dropdown.show .user-dropdown-menu {
+  animation: dropdownShow 0.2s ease-out !important;
+}
+
+/* User Info Section Styles */
+.user-info-section {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.user-details {
+  background: linear-gradient(135deg, #fff7ed, #fef3e2) !important;
+  border-radius: 12px !important;
+  margin: 8px !important;
+}
+
+.user-stats {
+  padding: 8px 0 0 0 !important;
+}
+
+.user-stats strong {
+  font-size: 14px !important;
+}
+
+.user-stats small {
+  font-size: 11px !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .user-dropdown-menu {
+    margin-top: 4px !important;
+    min-width: 250px !important;
+  }
+  
+  .user-dropdown-item {
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+  }
+  
+  .user-details {
+    padding: 12px !important;
+  }
+  
+  .user-details .rounded-circle,
+  .user-details img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+</style>

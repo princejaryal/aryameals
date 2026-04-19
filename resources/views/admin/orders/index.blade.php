@@ -32,7 +32,6 @@
                     <thead class="bg-purple-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Customer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Items</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Total</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -44,16 +43,6 @@
                                 <div>
                                     <p class="font-medium text-purple-900">{{ $order->customer_name }}</p>
                                     <p class="text-sm text-purple-500">{{ $order->customer_phone }}</p>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="space-y-1">
-                                    @foreach($order->formatted_items as $item)
-                                        <div class="flex justify-between text-sm">
-                                            <span class="text-purple-900">{{ $item['name'] }} x{{ $item['quantity'] }}</span>
-                                            <span class="text-purple-600">₹{{ number_format($item['price'] * $item['quantity'], 0) }}</span>
-                                        </div>
-                                    @endforeach
                                 </div>
                             </td>
                             <td class="px-6 py-4">

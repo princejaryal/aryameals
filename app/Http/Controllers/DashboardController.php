@@ -23,6 +23,9 @@ class DashboardController extends Controller
             'total_menu_items' => MenuItem::count(),
             'total_orders' => Order::count(),
             
+            // Total revenue from all orders
+            'total_revenue' => Order::sum('total_amount'),
+            
             // Today's stats
             'today_orders' => Order::whereDate('created_at', $today)->count(),
             'today_revenue' => Order::whereDate('created_at', $today)->sum('total_amount'),
@@ -142,6 +145,7 @@ class DashboardController extends Controller
             'avg_order_value' => Order::count() > 0 ? Order::average('total_amount') : 0,
             'this_month_orders' => Order::whereMonth('created_at', $thisMonth)->count(),
             'this_month_revenue' => Order::whereMonth('created_at', $thisMonth)->sum('total_amount'),
+            'total_revenue' => Order::sum('total_amount'),
             'total_customers' => User::count(),
             'total_restaurants' => Restaurant::count(),
             'active_restaurants' => Restaurant::where('is_active', true)->count(),

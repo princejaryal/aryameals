@@ -773,6 +773,13 @@
             .then(result => {
                 if (result.success) {
                     showNotification('Order placed successfully!', 'success');
+                    
+                    // Open WhatsApp with order details
+                    if (result.whatsapp_message && result.whatsapp_number) {
+                        const whatsappUrl = `https://wa.me/${result.whatsapp_number}?text=${result.whatsapp_message}`;
+                        window.open(whatsappUrl, '_blank');
+                    }
+                    
                     setTimeout(() => {
                         window.location.href = result.redirect_url || '/order/success';
                     }, 1500);

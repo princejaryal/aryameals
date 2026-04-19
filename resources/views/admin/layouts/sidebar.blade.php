@@ -47,17 +47,49 @@
             <p class="font-semibold text-purple-400 mb-2">Today's Performance</p>
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                    <span class="text-purple-200">Orders in queue</span>
-                    <span class="text-pink-300 font-bold">12</span>
-                </div>
-                <div class="h-2 w-full bg-purple-600/50 rounded-full overflow-hidden">
-                    <div class="h-full w-3/4 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full animate-pulse"></div>
+                    <span class="text-purple-200">Today's Orders</span>
+                    <span class="text-pink-300 font-bold" id="sidebar-today-orders">{{ $stats['today_orders'] ?? 0 }}</span>
                 </div>
                 <div class="flex items-center justify-between pt-1">
-                    <span class="text-purple-200">Efficiency</span>
-                    <span class="text-yellow-300 font-bold">87%</span>
+                    <span class="text-purple-200">Today's Revenue</span>
+                    <span class="text-yellow-300 font-bold">Rs.{{ number_format($stats['today_revenue'] ?? 0, 0) }}</span>
                 </div>
             </div>
         </div>
     </div>
 </aside>
+
+<script>
+// Update sidebar performance data
+function updateSidebarPerformance() {
+    fetch('{{ route("admin.dashboard.stats") }}')
+        .then(response => response.json())
+        .then(data => {
+            // Update today's orders
+            const ordersElement = document.getElementById('sidebar-today-orders');
+            if (ordersElement) {
+                ordersElement.textContent = data.today_orders || 0;
+            }
+            
+            // Update orders progress bar
+            const progressElement = document.getElementById('sidebar-orders-progress');
+            if (progressElement) {
+                const progressWidth = Math.min(100, (data.today_orders || 0) * 5);
+                progressElement.style.width = progressWidth + '%';
+            }
+            
+            // Update today's revenue
+            const revenueElement = document.querySelector('.text-yellow-300.font-bold');
+            if (revenueElement && revenueElement.textContent.includes('Rs.')) {
+                revenueElement.textContent = 'Rs.' + (data.today_revenue || 0).toFixed(0);
+            }
+        })
+        .catch(error => console.error('Error updating sidebar performance:', error));
+}
+
+// Update sidebar data every 30 seconds
+setInterval(updateSidebarPerformance, 30000);
+
+// Update on page load
+document.addEventListener('DOMContentLoaded', updateSidebarPerformance);
+</script>

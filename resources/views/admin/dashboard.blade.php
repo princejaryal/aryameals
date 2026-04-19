@@ -77,11 +77,11 @@
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-xs text-white uppercase tracking-[0.16em] font-semibold">Total Revenue</p>
-                        <p class="mt-3 text-3xl font-bold text-white">${{ number_format($stats['this_month_revenue'], 2) }}</p>
+                        <p class="mt-3 text-3xl font-bold text-white">₹{{ number_format($stats['total_revenue'], 0) }}</p>
                         <div class="mt-2 flex items-center space-x-2">
                             <span class="inline-flex items-center text-emerald-300 text-xs font-semibold">
                                 <i class="fas fa-chart-line mr-1"></i>
-                                This Month
+                                All Time
                             </span>
                             <span class="text-white/80 text-xs">Complete</span>
                         </div>
@@ -387,7 +387,7 @@
                     updateStatValue('.stat-card.customers .text-3xl', data.total_customers);
                     updateStatValue('.stat-card.total-orders .text-3xl', data.total_orders);
                     updateStatValue('.stat-card.avg-order .text-3xl', 'Rs.' + data.avg_order_value.toFixed(0));
-                    updateStatValue('.stat-card.total-revenue .text-3xl', '$' + data.this_month_revenue.toFixed(2));
+                    updateStatValue('.stat-card.total-revenue .text-3xl', 'Rs.' + data.total_revenue.toFixed(0));
                 })
                 .catch(error => console.error('Error loading dashboard stats:', error));
         }

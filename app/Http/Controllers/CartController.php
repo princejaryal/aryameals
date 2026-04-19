@@ -436,11 +436,16 @@ class CartController extends Controller
 
             DB::commit();
 
+            // Prepare order details for WhatsApp message
+            $whatsappMessage = $this->generateWhatsAppOrderMessage($order, $cartItems, $address, $feeData);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Order placed successfully!',
                 'order_id' => $order->id,
-                'redirect_url' => route('checkout.success', $order->id)
+                'redirect_url' => route('checkout.success', $order->id),
+                'whatsapp_message' => $whatsappMessage,
+                'whatsapp_number' => '+918544772623'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -520,5 +525,52 @@ class CartController extends Controller
             ->get();
 
         return view('order_list', compact('orders', 'status'));
+    }
+
+    /**
+     * Generate WhatsApp message with complete order details
+     */
+    private function generateWhatsAppOrderMessage($order, $cartItems, $address, $feeData)
+    {
+        $message =  "New order received from Arya Meals\n\n";
+        $message .= "*Order Details:*\n";
+        $message .= "Order ID: #{$order->id}\n";
+        $message .= "Customer: {$order->customer_name}\n";
+        $message .= "Phone: {$order->customer_phone}\n\n";
+
+        $message .= "*Delivery Address:*\n";
+        $message .= "{$address->address_line_1}\n";
+        if ($address->address_line_2) {
+            $message .= "{$address->address_line_2}\n";
+        }
+        $message .= "{$address->city}, {$address->state} - {$address->postal_code}\n\n";
+
+        $message .= "*Order Items:*\n";
+        foreach ($cartItems as $item) {
+            $restaurantName = $item->menuItem->restaurant->name ?? 'Unknown Restaurant';
+            $portionSize = $item->portion_size == 'half' ? 'Half Plate' : 'Full Plate';
+            $message .= "• {$item->quantity}x {$item->menuItem->name} ({$portionSize})\n";
+            $message .= "  {$restaurantName}\n";
+            $message .= "  Rs. " . number_format($item->total_price, 0) . "\n\n";
+        }
+
+        $message .= "*Payment Summary:*\n";
+        if (isset($feeData['subtotal'])) {
+            $message .= "Subtotal: {$feeData['subtotal']}\n";
+        }
+        if (isset($feeData['fees']) && !empty($feeData['fees'])) {
+            foreach ($feeData['fees'] as $fee) {
+                $message .= "{$fee['name']}: {$fee['amount']}\n";
+            }
+        }
+        $message .= "Total Amount: {$feeData['grand_total']}\n\n";
+
+        $message .= "*Order Date & Time:*\n";
+        $message .= $order->created_at->format('d M Y, h:i A') . "\n\n";
+
+        $message .= "*Status: Pending*\n\n";
+        $message .= "_Please prepare this order for delivery._";
+
+        return urlencode($message);
     }
 }

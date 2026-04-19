@@ -13,15 +13,22 @@ class CategoryController extends Controller
      */
     public function show($category)
     {
+        // Convert URL category format to database format
+        if ($category === 'add-ons-&-extras') {
+            $dbCategory = 'add-ons & extras'; // Special case for Arya Grocery category
+        } else {
+            $dbCategory = str_replace(['-', '_'], ' ', $category);
+        }
+        
         // Get menu items for the specific category from database
         $menuItems = MenuItem::with('restaurant')
-            ->byCategory($category)
+            ->byCategory($dbCategory)
             ->whereHas('restaurant', function ($query) {
                 return $query->where('is_active', true); // Only get items from active restaurants
             })
             ->available()
             ->get()
-            ->map(function ($item) use ($category) {
+            ->map(function ($item) use ($dbCategory) {
                 $result = [
                     'id' => $item->id,
                     'name' => $item->name,
@@ -36,19 +43,24 @@ class CategoryController extends Controller
                 ];
                 
                 // Add unit information for grocery items
-                if ($item->restaurant && $item->restaurant->name === 'Arya Meals' && $category === 'add-ons-&-extras') {
-                    // Map grocery items to their units
-                    $units = [
-                        'Tomatoes' => '1 kg', 'Onions' => '1 kg', 'Potatoes' => '1 kg', 'Carrots' => '1 kg',
-                        'Green Chilies' => '250 g', 'Lemon' => '1 kg', 'Garlic' => '1 kg', 'Ginger' => '1 kg',
-                        'Apples' => '1 kg', 'Oranges' => '1 kg', 'Mangoes' => '1 kg', 'Grapes' => '1 kg', 'Pomegranate' => '1 kg',
-                        'Cheese' => '200 g', 'Paneer' => '200 g', 'Butter Naan' => '4 pcs', 'Biscuits' => '1 pack',
-                        'Basmati Rice' => '1 kg', 'Chana Dal' => '1 kg', 'Toor Dal' => '1 kg', 'Moong Dal' => '1 kg',
-                        'Sunflower Oil' => '1 litre', 'Turmeric Powder' => '200 g', 'Red Chili Powder' => '200 g',
-                        'Coriander Powder' => '200 g', 'Cumin Seeds' => '200 g', 'Cooking Masala' => '200 g', 'Sambar Powder' => '200 g'
-                    ];
-                    
-                    $result['unit'] = $units[$item->name] ?? null;
+                if ($item->restaurant && ($item->restaurant->name === 'Arya Grocery' || $item->restaurant->name === 'Arya Meals') && $dbCategory === 'add-ons & extras') {
+                    // Use unit from database if available, otherwise map to known units
+                    if ($item->unit) {
+                        $result['unit'] = $item->unit;
+                    } else {
+                        // Map grocery items to their units (fallback)
+                        $units = [
+                            'Tomatoes' => '1 kg', 'Onions' => '1 kg', 'Potatoes' => '1 kg', 'Carrots' => '1 kg',
+                            'Green Chilies' => '250 g', 'Lemon' => '1 kg', 'Garlic' => '1 kg', 'Ginger' => '1 kg',
+                            'Apples' => '1 kg', 'Oranges' => '1 kg', 'Mangoes' => '1 kg', 'Grapes' => '1 kg', 'Pomegranate' => '1 kg',
+                            'Cheese' => '200 g', 'Paneer' => '200 g', 'Butter Naan' => '4 pcs', 'Biscuits' => '100 g',
+                            'Basmati Rice' => '1 kg', 'Chana Dal' => '1 kg', 'Toor Dal' => '500 g', 'Moong Dal' => '1 kg',
+                            'Sunflower Oil' => '1 litre', 'Turmeric Powder' => '200 g', 'Red Chili Powder' => '200 g',
+                            'Coriander Powder' => '200 g', 'Cumin Seeds' => '200 g', 'Cooking Masala' => '200 g', 'Sambar Powder' => '200 g'
+                        ];
+                        
+                        $result['unit'] = $units[$item->name] ?? null;
+                    }
                 }
                 
                 return $result;
